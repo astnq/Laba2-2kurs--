@@ -1,102 +1,99 @@
-//var 1
-#include "include/tree.h"
+#include "../include/tree.h"
 
-struct TreeNode {
-    int value;
-    TreeNode* left;
-    TreeNode* right;
+NodeT::NodeT(int value) { 
+    data = value;
+    left = nullptr;
+    right = nullptr;
+}
 
-    TreeNode(int val) : value(val), left(nullptr), right(nullptr) {}
-};
+CompleteBinaryTree::CompleteBinaryTree() { 
+    root = nullptr;
+    size = 0;
+}
 
-class BST {
-public:
-    TreeNode* root;
+void CompleteBinaryTree::print() {
+    printTree(root, 0);
+    cout << endl;
+}
 
-    BST() : root(nullptr) {}
+string CompleteBinaryTree::toString() {
+    return _toString(root); 
+}
 
-    void insert(int val) {
-        root = insertRec(root, val);
+void CompleteBinaryTree::insert(int value) {
+    root = _insert(root, value);
+    size++;
+}
+
+NodeT* CompleteBinaryTree::_insert(NodeT* nodeb, int value) {
+    if (nodeb == nullptr) { // Если текущий узел равен нулю
+        return new NodeT(value); // Создаем новый узел и возвращаем его
     }
 
-    void remove(int val) {
-        root = removeRec(root, val);
+    if (value < nodeb->data) { // Сравниваем значения
+        nodeb->left = _insert(nodeb->left, value); // Рекурсивно вставляем в левое поддерево
+    } else {
+        nodeb->right = _insert(nodeb->right, value); // Рекурсивно вставляем в правое поддерево
     }
 
-    void inorder() {
-        inorderRec(root);
-        cout << std::endl;
-    }
+    return nodeb; // Возвращаем текущий узел
+}
 
-private:
-    TreeNode* insertRec(TreeNode* node, int val) {
-        if (node == nullptr) {
-            return new TreeNode(val);
-        }
+bool CompleteBinaryTree::search(NodeT* nodet, int value) {
+    if(nodet == nullptr) return false;
+    if(nodet->data == value) return true;
+    return search(nodet->left, value) || search(nodet->right, value);
+}
 
-        if (val < node->value) {
-            node->left = insertRec(node->left, val);
-        } else if (val > node->value) {
-            node->right = insertRec(node->right, val);
-        }
+bool CompleteBinaryTree::isComplete() { 
+    int nodetCount = countNodes(root);
+    return isComplete(root, 0 , size);
+}
 
-        return node;
-    }
+bool CompleteBinaryTree::isComplete(NodeT* nodet, int index, int totalNodes) {
+    if(nodet == nullptr) return true; // Если узел пустой, это считается полным 
+    if(index >= totalNodes) return false; // Если индекс больше и равен количеству узлов, не полное
 
-    TreeNode* removeRec(TreeNode* node, int val) {
-        if (node == nullptr) {
-            return node; // Узел не найден
-        }
+    // Проверяем рекурсивно для левого и правого поддеревья 
+    return isComplete(nodet->left, 2 * index + 1, totalNodes) &&
+           isComplete(nodet->right, 2 * (index + 1), totalNodes);
+}
 
-        if (val < node->value) {
-            node->left = removeRec(node->left, val);
-        } else if (val > node->value) {
-            node->right = removeRec(node->right, val);
-        } else {
-            // Узел найден
+int CompleteBinaryTree::countNodes(NodeT* nodet) {
+    if (nodet == nullptr) return 0;
+    return 1 + countNodes(nodet->left) + countNodes(nodet->right);
+}
 
-            // Удаление случая 1: Узел - лист
-            if (node->left == nullptr && node->right == nullptr) {
-                delete node;
-                return nullptr;
-            }
+string CompleteBinaryTree::_toString(NodeT* nodet) {
+    if (nodet == nullptr) return "";
 
-            // Удаление случая 2: Узел имеет одного ребенка
-            if (node->left == nullptr) {
-                TreeNode* temp = node->right;
-                delete node;
-                return temp;
-            } else if (node->right == nullptr) {
-                TreeNode* temp = node->left;
-                delete node;
-                return temp;
-            }
+    ostringstream oss;
+    oss << nodet->data << " "; // Добавляем текущий узел
 
-            // Удаление случая 3: Узел имеет двух детей
-            // Найдем минимальный узел в правом поддереве
-            TreeNode* minNode = findMin(node->right);
-            node->value = minNode->value; // Замена значением минимального узла
-            node->right = removeRec(node->right, minNode->value); // Удаляем минимальный узел
-        }
+    oss << _toString(nodet->left); // Рекурсивно добавляем элементы из левого поддерева
+    oss << _toString(nodet->right); // Рекурсивно добавляем элементы из правого поддерева
 
-        return node;
-    }
+    return oss.str();
+}
 
-    TreeNode* findMin(TreeNode* node) {
-        while (node->left != nullptr) {
-            node = node->left;
-        }
-        return node;
-    }
 
-    void inorderRec(TreeNode* node) {
-        if (node != nullptr) {
-            inorderRec(node->left);
-            cout << node->value << " ";
-            inorderRec(node->right);
-        }
-    }
-};
+void CompleteBinaryTree::printTree(NodeT* node, int depth) { 
+    if(node == nullptr) return;
+    printTree(node->right, depth + 1);
+    cout << setw(4 * depth) << " " << node->data << endl;
+    printTree(node->left, depth + 1);
+}
+
+void CompleteBinaryTree::clear(NodeT* nodet) {
+    if(nodet == nullptr) return; 
+    clear(nodet->left);
+    clear(nodet->right);
+    delete nodet;
+}
+
+CompleteBinaryTree::~CompleteBinaryTree(){
+    clear(root);
+}
 
 int main() {
     BST tree;
