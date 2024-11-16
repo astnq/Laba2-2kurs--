@@ -1,5 +1,3 @@
-#include "include/stack.h"
-// VAR_3
 #include "stack.cpp"
 
 int priority(char arif) { //Функия для определения приоритета оператора
