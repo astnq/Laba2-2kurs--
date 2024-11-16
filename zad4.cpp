@@ -1,21 +1,23 @@
-//var 1
-#include "include/array.h"
-#include <vector>
-void printSubsets(const vector<char>& arr) {
-    int n = arr.size();
-    set<vector<char>> subsets; // Используем set для хранения уникальных подмассивов
+#include "array.cpp"
 
-    // Генерация подмножеств с помощью битовых масок
-    for (int i = 0; i < (1 << n); ++i) {
-        vector<char> subset;
-        for (int j = 0; j < n; ++j) {
-            // Проверяем, установлен ли j-ый бит в i
-            if (i & (1 << j)) {
-                subset.push_back(arr[j]);
-            }
+bool hasCorrectWord(const string& word, Array& dictionary) {
+    for (size_t i = 0; i < dictionary.getSize(); ++i) {
+        if (dictionary.getIndex(i) == word) {
+            return true; // Слово найдено в словаре
         }
-        subsets.insert(subset); // Добавляем подмассив в множество уникальных подмассивов
     }
+    return false; // Слово не найдено в словаре
+}
+
+int countWord(const string& word) {
+    int count = 0;
+    for (char symbol : word) { // Цикл который перебирает каждый символ в строчке 
+        if (symbol >= 'A' && symbol <= 'Z') {
+            count++;
+        }
+    }
+    return count;
+}
 
     // Выводим уникальные подмассивы
     for (const auto& subset : subsets) {
